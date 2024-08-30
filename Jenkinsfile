@@ -14,14 +14,14 @@ pipeline {
             steps {
                 script {
                     // Создаем директорию для установки
-                    sh 'mkdir -p ${USER_BIN}'
+                    // sh 'mkdir -p ${USER_BIN}'
 
                     // Устанавливаем CodeQL
-                    sh '''
+                    /*sh '''
                     wget https://github.com/github/codeql-cli-binaries/releases/download/v2.12.0/codeql-linux64.zip -O codeql.zip
                     unzip codeql.zip -d ${USER_BIN}
                     rm codeql.zip
-                    '''
+                    '''*/
 
                     // Устанавливаем Semgrep
                     sh '''
