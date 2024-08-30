@@ -30,7 +30,7 @@ pipeline {
                     rm semgrep.tar.gz
                     '''
 
-                    // Устанавливаем Njsscan
+                    /*// Устанавливаем Njsscan
                     sh 'pip install njsscan'
 
                     // Устанавливаем cdxgen
@@ -48,7 +48,7 @@ pipeline {
                     wget https://github.com/projectdiscovery/nuclei/releases/download/v2.8.7/nuclei_2.8.7_linux_amd64.zip -O nuclei.zip
                     unzip nuclei.zip -d ${USER_BIN}
                     rm nuclei.zip
-                    '''
+                    '''*/
 
                     // Устанавливаем Zap
                     sh '''
