@@ -31,7 +31,11 @@ pipeline {
                     '''
 
                     // Устанавливаем Njsscan
-                    sh 'npm install -g njsscan --prefix ${USER_BIN}'
+                    sh '''
+                    wget https://github.com/guard/security/releases/download/v1.0.0/njsscan-linux-x64.tar.gz -O njsscan.tar.gz
+                    tar -xzf njsscan.tar.gz -C ${USER_BIN}
+                    rm njsscan.tar.gz
+                    '''
 
                     // Устанавливаем cdxgen
                     sh 'npm install -g @snyk/cdxgen --prefix ${USER_BIN}'
