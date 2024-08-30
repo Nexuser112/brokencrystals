@@ -52,7 +52,7 @@ pipeline {
 
                     // Устанавливаем Zap
                     sh '''
-                    wget https://github.com/zaproxy/zap-extensions/releases/download/v2.13.0/ZAP_2.13.0_Linux.tar.gz -O zap.tar.gz
+                    wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2.15.0_Linux.tar.gz -O zap.tar.gz
                     tar -xzf zap.tar.gz -C ${USER_BIN}
                     rm zap.tar.gz
                     '''
