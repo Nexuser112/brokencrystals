@@ -34,7 +34,7 @@ pipeline {
                     sh 'pip install njsscan'
 
                     // Устанавливаем cdxgen
-                    sh 'npm install -g @snyk/cdxgen --prefix ${USER_BIN}'
+                    sh 'npm install -g @cyclonedx/cdxgen --prefix ${USER_BIN}'
 
                     // Устанавливаем Trivy
                     sh '''
