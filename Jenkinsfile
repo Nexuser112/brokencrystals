@@ -14,7 +14,7 @@ pipeline {
                 script {
                     // Установка CodeQL
                     sh '''
-                    curl -sSL https://github.com/github/codeql-cli-binaries/releases/download/v2.12.0/codeql-linux64.zip -o codeql.zip
+                    wget https://github.com/github/codeql-cli-binaries/releases/download/v2.12.0/codeql-linux64.zip -O codeql.zip
                     unzip -o codeql.zip -d /usr/local/bin
                     rm codeql.zip
                     '''
