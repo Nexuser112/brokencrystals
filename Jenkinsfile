@@ -25,7 +25,7 @@ pipeline {
 
                     // Устанавливаем Semgrep
                     sh '''
-                    wget https://github.com/returntocorp/semgrep/releases/download/v1.0.0/semgrep-linux_amd64.tar.gz -O semgrep.tar.gz
+                    wget https://github.com/returntocorp/semgrep/releases/download/v1.85.0/semgrep-linux_amd64.tar.gz -O semgrep.tar.gz
                     tar -xzf semgrep.tar.gz -C ${USER_BIN}
                     rm semgrep.tar.gz
                     '''
