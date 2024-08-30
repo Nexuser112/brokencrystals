@@ -12,32 +12,39 @@ pipeline {
         stage('Install Tools') {
             steps {
                 script {
-                    // Устанавливаем CodeQL
-                    sh 'brew install codeql'
+                    // Установка CodeQL
+                    sh 'curl -sSL https://github.com/github/codeql-cli-binaries/releases/download/v2.12.0/codeql-linux64.zip -o codeql.zip'
+                    sh 'unzip codeql.zip -d /usr/local/bin'
                     
-                    // Устанавливаем Semgrep
-                    sh 'brew install semgrep'
+                    // Установка Semgrep
+                    sh 'pip install semgrep'
                     
-                    // Устанавливаем Njsscan
+                    // Установка Njsscan
                     sh 'npm install -g njsscan'
                     
-                    // Устанавливаем cdxgen
+                    // Установка Cdxgen
                     sh 'npm install -g @snyk/cdxgen'
                     
-                    // Устанавливаем Trivy
-                    sh 'brew install trivy'
+                    // Установка Trivy
+                    sh 'curl -sSL https://github.com/aquasecurity/trivy/releases/download/v0.31.2/trivy_0.31.2_Linux-64bit.tar.gz -o trivy.tar.gz'
+                    sh 'tar xzf trivy.tar.gz -C /usr/local/bin'
                     
-                    // Устанавливаем Nuclei
-                    sh 'brew install nuclei'
+                    // Установка Nuclei
+                    sh 'curl -sSL https://github.com/projectdiscovery/nuclei/releases/download/v2.6.7/nuclei_2.6.7_linux_amd64.tar.gz -o nuclei.tar.gz'
+                    sh 'tar xzf nuclei.tar.gz -C /usr/local/bin'
                     
-                    // Устанавливаем Zap
-                    sh 'brew install zap'
+                    // Установка Zap
+                    sh 'curl -sSL https://github.com/zaproxy/zaproxy/releases/download/v2.12.0/ZAP_2.12.0_Linux.tar.gz -o zap.tar.gz'
+                    sh 'tar xzf zap.tar.gz -C /usr/local/bin'
                     
-                    // Устанавливаем Gitleaks
-                    sh 'brew install gitleaks'
+                    // Установка Gitleaks
+                    sh 'curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.13.0/gitleaks-linux-amd64 -o /usr/local/bin/gitleaks'
+                    sh 'chmod +x /usr/local/bin/gitleaks'
                     
-                    // Устанавливаем Kics
-                    sh 'brew install checkov'
+                    // Установка Kics
+                    sh 'curl -sSL https://github.com/Checkmarx/kics/releases/download/v1.6.1/kics_1.6.1_Linux_x86_64.tar.gz -o kics.tar.gz'
+                    sh 'tar xzf kics.tar.gz -C /usr/local/bin'
+
                 }
             }
         }
