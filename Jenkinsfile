@@ -13,8 +13,6 @@ pipeline {
         stage('Install Tools') {
             steps {
                 script {
-                    // Создаем директорию для установки
-                    sh 'mkdir -p ${USER_BIN}'
 
                     // Устанавливаем CodeQL
                     sh '''
