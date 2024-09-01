@@ -11,11 +11,11 @@ pipeline {
     }
 
     stages {
-         stage('Install Tools') {
+         /* stage('Install Tools') {
             steps {
                 script {
 
-                    /*// Устанавливаем CodeQL
+                    // Устанавливаем CodeQL
                     sh '''
                     wget https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -O codeql.zip
                     unzip codeql.zip -d ${USER_BIN}
@@ -72,13 +72,11 @@ pipeline {
                     wget https://github.com/bridgecrewio/checkov/releases/download/3.2.239/checkov_linux_X86_64.zip -O kics.zip
                     unzip kics.zip -d ${USER_BIN}
                     rm kics.zip
-                    '''*/
-
-                    sh 'chmod -R +x ${USER_BIN}'
+                    '''
                 
                 }
             }
-        }
+        } */
 
         stage('SAST') {
             parallel {
