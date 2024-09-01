@@ -85,7 +85,7 @@ pipeline {
                     steps {
                         script {
                             // sh '${USER_BIN}/codeql/codeql database create codeql-db --language=javascript --source-root=${SCAN_DIR}'
-                            sh '${USER_BIN}/codeql/codeql analyze codeql-db --format=sarifv2.1.0 --output=codeql-results.sarif'
+                            sh '${USER_BIN}codeql/codeql database analyze /path/to/database --format=sarifv2.1.0 --output=/path/to/output/codeql-results.sarif'
                         }
                     }
                 }
