@@ -75,7 +75,7 @@ pipeline {
                     '''*/
 
                     sh 'chmod -R +x ${USER_BIN}'
-                    sh '${USER_BIN}/codeql pack install javascript'
+                
                 }
             }
         }
