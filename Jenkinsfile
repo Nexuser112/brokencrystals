@@ -15,7 +15,7 @@ pipeline {
                 script {
 
                     // Устанавливаем CodeQL
-                    sh '''
+                    /*sh '''
                     wget https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -O codeql.zip
                     unzip codeql.zip -d ${USER_BIN}
                     rm codeql.zip
@@ -31,10 +31,14 @@ pipeline {
                     // Устанавливаем Njsscan
                     sh 'pip install njsscan'
 
-                    // Устанавливаем cdxgen
-                    sh 'npm install -g @cyclonedx/cdxgen --prefix ${USER_BIN}'
+                    */// Устанавливаем cdxgen
+                    sh '''
+                    wget https://github.com/CycloneDX/cdxgen/releases/download/v10.9.5/cdxgen-dist.zip -O cdxgen.zip
+                    unzip cdxgen.zip -d {USER_BIN}
+                    rm cdxgen.zip
+                    '''
 
-                    // Устанавливаем Trivy
+                    /*// Устанавливаем Trivy
                     sh '''
                     wget https://github.com/aquasecurity/trivy/releases/download/v0.31.2/trivy_0.31.2_Linux-64bit.tar.gz -O trivy.tar.gz
                     tar -xzf trivy.tar.gz -C ${USER_BIN}
@@ -67,7 +71,7 @@ pipeline {
                     wget https://github.com/bridgecrewio/checkov/releases/download/3.2.239/checkov_linux_X86_64.zip -O kics.zip
                     unzip kics.zip -d ${USER_BIN}
                     rm kics.zip
-                    '''
+                    '''*/
 
                 }
             }
