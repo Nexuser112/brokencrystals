@@ -31,14 +31,14 @@ pipeline {
                     // Устанавливаем Njsscan
                     sh 'pip install njsscan'
 
-                    */// Устанавливаем cdxgen
+                    // Устанавливаем cdxgen
                     sh '''
                     wget https://github.com/CycloneDX/cdxgen/releases/download/v10.9.5/cdxgen-dist.zip -O cdxgen.zip
                     unzip cdxgen.zip -d {USER_BIN}
                     rm cdxgen.zip
                     '''
 
-                    /*// Устанавливаем Trivy
+                    // Устанавливаем Trivy
                     sh '''
                     wget https://github.com/aquasecurity/trivy/releases/download/v0.31.2/trivy_0.31.2_Linux-64bit.tar.gz -O trivy.tar.gz
                     tar -xzf trivy.tar.gz -C ${USER_BIN}
