@@ -6,7 +6,7 @@ pipeline {
         DEFECTDOJO_API_KEY = 'Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5'
         SCAN_DIR = '/home/kali'
         GIT_HTTP_POSTBUFFER = '524288000'
-        USER_BIN = '/tmp/bin'
+        USER_BIN = '/home/jenkinsinstrument'
     }
 
     stages {
@@ -14,14 +14,14 @@ pipeline {
             steps {
                 script {
                     // Создаем директорию для установки
-                    // sh 'mkdir -p ${USER_BIN}'
+                    sh 'mkdir -p ${USER_BIN}'
 
                     // Устанавливаем CodeQL
-                    /*sh '''
+                    sh '''
                     wget https://github.com/github/codeql-cli-binaries/releases/download/v2.12.0/codeql-linux64.zip -O codeql.zip
                     unzip codeql.zip -d ${USER_BIN}
                     rm codeql.zip
-                    '''*/
+                    '''
 
                     // Устанавливаем Semgrep
                     sh '''
@@ -30,7 +30,7 @@ pipeline {
                     rm semgrep.tar.gz
                     '''
 
-                    /*// Устанавливаем Njsscan
+                    // Устанавливаем Njsscan
                     sh 'pip install njsscan'
 
                     // Устанавливаем cdxgen
@@ -48,7 +48,7 @@ pipeline {
                     wget https://github.com/projectdiscovery/nuclei/releases/download/v2.8.7/nuclei_2.8.7_linux_amd64.zip -O nuclei.zip
                     unzip nuclei.zip -d ${USER_BIN}
                     rm nuclei.zip
-                    '''*/
+                    '''
 
                     // Устанавливаем Zap
                     sh '''
@@ -59,15 +59,16 @@ pipeline {
 
                     // Устанавливаем Gitleaks
                     sh '''
-                    wget https://github.com/zricethezav/gitleaks/releases/download/v8.0.0/gitleaks_8.0.0_linux_x64.tar.gz -O gitleaks.tar.gz
+                    wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz -O gitleaks.tar.gz
                     tar -xzf gitleaks.tar.gz -C ${USER_BIN}
                     rm gitleaks.tar.gz
                     '''
 
                     // Устанавливаем Kics (Checkov)
                     sh '''
-                    wget https://github.com/bridgecrewio/checkov/releases/download/v2.1.0/checkov-linux-amd64 -O ${USER_BIN}/checkov
-                    chmod +x ${USER_BIN}/checkov
+                    wget https://github.com/bridgecrewio/checkov/releases/download/3.2.239/checkov_linux_X86_64.zip -O kics.zip
+                    unzip kics.zip -d ${USER_BIN}
+                    rm kics.zip
                     '''
 
                 }
