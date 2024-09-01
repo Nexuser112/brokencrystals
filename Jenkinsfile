@@ -93,7 +93,7 @@ pipeline {
                 stage('Semgrep') {
                     steps {
                         script {
-                            sh '${USER_BIN}/semgrep --config="auto" ${SCAN_DIR} --output=semgrep-results.json'
+                            sh '${USER_BIN}/semgrep-1.85.0 --config="auto" ${SCAN_DIR} --output=semgrep-results.json'
                         }
                     }
                 }
@@ -101,7 +101,7 @@ pipeline {
                 stage('Njsscan') {
                     steps {
                         script {
-                            sh '${USER_BIN}/njsscan ${SCAN_DIR} -o njsscan-results.json'
+                            sh 'njsscan ${SCAN_DIR} -o njsscan-results.json'
                         }
                     }
                 }
@@ -140,7 +140,7 @@ stage('OSA') {
                 stage('Zap') {
                     steps {
                         script {
-                            sh '${USER_BIN}/zap-cli quick-scan ${SCAN_DIR} -o zap-results.html'
+                            sh '${USER_BIN}/ZAP_2.15.0/zap.sh quick-scan --auto --target ${SCAN_DIR} --output zap-results.html'
                         }
                     }
                 }
