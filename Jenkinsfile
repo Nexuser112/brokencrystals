@@ -16,7 +16,7 @@ pipeline {
 
                     // Устанавливаем CodeQL
                     sh '''
-                    wget https://github.com/github/codeql-cli-binaries/releases/download/v2.12.0/codeql-linux64.zip -O codeql.zip
+                    wget https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -O codeql.zip
                     unzip codeql.zip -d ${USER_BIN}
                     rm codeql.zip
                     '''
