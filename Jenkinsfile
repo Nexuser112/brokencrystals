@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        CODEQL_DIR = "${WORKSPACE}/codeql"
         DEFECTDOJO_URL = 'http://localhost:8081'
         DEFECTDOJO_API_KEY = 'Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5'
         SCAN_DIR = '/home/kali'
@@ -16,8 +17,8 @@ pipeline {
                 // Устанавливаем CodeQL
                 sh '''
                     curl -L https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -o codeql.zip
-                    unzip codeql.zip -d /opt/codeql
-                    export PATH=$PATH:/opt/codeql/codeql
+                    unzip codeql.zip -d ${CODEQL_DIR}
+                    export PATH=$PATH:${CODEQL_DIR}/codeql
                 '''
                 // Устанавливаем Semgrep
                 sh '''
