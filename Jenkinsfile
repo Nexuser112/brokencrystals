@@ -3,7 +3,6 @@
     environment {
         SCAN_DIR = "/home/kali"
         CODEQL_VERSION = "latest"
-        DEPENDENCY_TRACK_API_KEY = credentials('dependency-track-api-key')
         DEFECT_DOJO_API_KEY = credentials('Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5')
         DEFECT_DOJO_URL = 'http://localhost:8081'
     }
