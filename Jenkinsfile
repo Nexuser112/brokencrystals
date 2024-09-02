@@ -20,8 +20,7 @@ pipeline {
                 '''
                 // Устанавливаем Semgrep
                 sh '''
-                    curl -L https://github.com/returntocorp/semgrep/releases/latest/download/semgrep-linux-amd64 -o ${TOOLS_DIR}/semgrep
-                    chmod +x ${TOOLS_DIR}/semgrep
+                    pip3 install semgrep
                 '''
                 // Устанавливаем Njsscan
                 sh '''
