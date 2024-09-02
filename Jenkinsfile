@@ -12,6 +12,18 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Git') {
+            steps {
+                sh 'git config --global http.postBuffer ${GIT_HTTP_POSTBUFFER}' 
+                sh 'git config --global http.version HTTP/1.1'                   
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm  
+            }
+        }
          stage('Install Dependencies') {
             steps {
                 // Создаем директорию
