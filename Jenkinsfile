@@ -30,7 +30,7 @@ pipeline {
                 sh '''
                     curl -L https://github.com/CycloneDX/cdxgen/releases/download/v10.9.6/cdxgen-dist.zip -o cdxgen.zip
                     unzip cdxgen.zip -d ${TOOLS_DIR}
-                    chmod +x ${TOOLS_DIR}/cdxgen
+                    chmod +x ${TOOLS_DIR}/cdxgen-latest-x86_64.AppImage
                 '''
                 // Устанавливаем Trivy
                 sh '''
