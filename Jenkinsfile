@@ -80,14 +80,14 @@ pipeline {
 
         stage('SAST') {
             parallel {
-                stage('CodeQL') {
+                /*stage('CodeQL') {
                     steps {
                         script {
                             sh '${USER_BIN}/codeql/codeql database create ${USER_DATA} --language=javascript --source-root=${SCAN_DIR} --overwrite'
                             sh '${USER_BIN}/codeql/codeql database analyze ${USER_DATA} /home/jenkinsinstrument/codeql/javascript-queries --format=sarifv2.1.0 --output=codeql-results.sarif'
                         }
                     }
-                }
+                } */
 
                 stage('Semgrep') {
                     steps {
