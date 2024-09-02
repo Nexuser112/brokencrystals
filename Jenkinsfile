@@ -15,7 +15,7 @@ pipeline {
             steps {
                 // Устанавливаем CodeQL
                 sh '''
-                    curl -L https://github.com/github/codeql-cli-binaries/releases/download/${CODEQL_VERSION}/codeql-linux64.zip -o codeql.zip
+                    curl -L https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -o codeql.zip
                     unzip codeql.zip -d /opt/codeql
                     export PATH=$PATH:/opt/codeql/codeql
                 '''
