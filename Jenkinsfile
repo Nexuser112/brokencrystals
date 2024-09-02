@@ -8,7 +8,6 @@ pipeline {
         DEFECTDOJO_API_KEY = 'Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5'
         SCAN_DIR = '/home/kali'
         GIT_HTTP_POSTBUFFER = '524288000'
-        USER_BIN = '/home/jenkinsinstrument'
         USER_DATA = '/home/jenkinsinstrument/databaza'
     }
 
@@ -160,3 +159,4 @@ stage('Upload SBOM to Dependency Track') {
             cleanWs()
         }
     }
+}
