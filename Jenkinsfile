@@ -28,7 +28,8 @@ pipeline {
                 '''
                 // Устанавливаем cdxgen
                 sh '''
-                    curl -L https://github.com/CycloneDX/cdxgen/releases/latest/download/cdxgen-linux-x64 -o ${TOOLS_DIR}/cdxgen
+                    curl -L https://github.com/CycloneDX/cdxgen/releases/download/v10.9.6/cdxgen-dist.zip -o cdxgen.zip
+                    unzip cdxgen.zip -d ${TOOLS_DIR}
                     chmod +x ${TOOLS_DIR}/cdxgen
                 '''
                 // Устанавливаем Trivy
@@ -49,12 +50,17 @@ pipeline {
                 '''
                 // Устанавливаем Gitleaks
                 sh '''
-                    curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | bash
-                    mv gitleaks ${TOOLS_DIR}/gitleaks
+                    curl -L https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz -O gitleaks.tar.gz
+                    tar -xzf gitleaks.tar.gz -C ${TOOLS_DIR}
+                    rm gitleaks.tar.gz
+                    chmod +x ${TOOLS_DIR}/gitleaks
                 '''
                 // Устанавливаем Kics
                 sh '''
-                    curl -sSfL https://github.com/Checkmarx/kics/releases/latest/download/kics-linux-amd64.tar.gz | tar -xz -C ${TOOLS_DIR}
+                    curl -L https://github.com/bridgecrewio/checkov/releases/download/3.2.239/checkov_linux_X86_64.zip -O kics.zip
+                    unzip kics.zip -d ${TOOLS_DIR}
+                    rm kics.zip
+                    chmod +x ${TOOLS_DIR}/kics
                 '''
             }
         }
