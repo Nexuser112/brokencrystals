@@ -44,7 +44,7 @@ pipeline {
                 '''
                 // Устанавливаем OWASP ZAP
                 sh '''
-                    curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2_11_1_unix.sh -o zap.sh
+                    curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2_14_0_unix.sh -o zap.sh
                     chmod +x zap.sh
                     ./zap.sh -q
                 '''
