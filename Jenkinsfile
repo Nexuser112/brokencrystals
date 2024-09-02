@@ -27,11 +27,14 @@ pipeline {
                     pip install njsscan
                 '''
                 // Устанавливаем cdxgen
-                sh '''
+                /*sh '''
                     curl -L https://github.com/CycloneDX/cdxgen/releases/download/v10.9.6/cdxgen-dist.zip -o cdxgen.zip
                     unzip cdxgen.zip -d ${TOOLS_DIR}
                     chmod +x ${TOOLS_DIR}/cdxgen-latest-x86_64.AppImage
-                '''
+                '''*/
+                sh '''
+                   chmod +x ${TOOLS_DIR}/cdxgen-latest-x86_64.AppImage
+                   '''
                 // Устанавливаем Trivy
                 sh '''
                     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/scripts/install.sh | sh -s -- -b ${TOOLS_DIR}
