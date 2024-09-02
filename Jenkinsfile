@@ -23,7 +23,7 @@ pipeline {
                     curl -L https://github.com/github/codeql-cli-binaries/releases/download/latest/codeql-linux64.zip -o codeql.zip
                     unzip codeql.zip -d ${CODEQL_DIR}
                     export PATH=$PATH:${CODEQL_DIR}/codeql
-                   '''
+                '''
                 // Устанавливаем Semgrep
                 sh '''
                     pip3 install semgrep
@@ -33,14 +33,11 @@ pipeline {
                     pip install njsscan
                 '''
                 // Устанавливаем cdxgen
-                /*sh '''
+                sh '''
                     curl -L https://github.com/CycloneDX/cdxgen/releases/download/v10.9.6/cdxgen-dist.zip -o cdxgen.zip
                     unzip cdxgen.zip -d ${TOOLS_DIR}
                     chmod +x ${TOOLS_DIR}/cdxgen-latest-x86_64.AppImage
-                '''*/
-                sh '''
-                   chmod +x ${TOOLS_DIR}/cdxgen-latest-x86_64.AppImage
-                   '''
+                '''
                 // Устанавливаем Trivy
                 sh '''
                     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/scripts/install.sh | sh -s -- -b ${TOOLS_DIR}
