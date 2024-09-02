@@ -1,13 +1,17 @@
-    pipeline {
+pipeline {
     agent any
+
     environment {
-        SCAN_DIR = "/home/kali"
-        CODEQL_VERSION = "latest"
-        DEFECT_DOJO_API_KEY = credentials('Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5')
-        DEFECT_DOJO_URL = 'http://localhost:8081'
+        DEFECTDOJO_URL = 'http://localhost:8081'
+        DEFECTDOJO_API_KEY = 'Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5'
+        SCAN_DIR = '/home/kali'
+        GIT_HTTP_POSTBUFFER = '524288000'
+        USER_BIN = '/home/jenkinsinstrument'
+        USER_DATA = '/home/jenkinsinstrument/databaza'
     }
+
     stages {
-        stage('Install Dependencies') {
+         stage('Install Dependencies') {
             steps {
                 // Устанавливаем CodeQL
                 sh '''
@@ -56,105 +60,109 @@
             }
         }
 
-        stage('SAST: CodeQL') {
-            steps {
-                sh '''
-                    codeql database create ${SCAN_DIR}/codeql-db --language=javascript --source-root=${SCAN_DIR}
-                    codeql database analyze ${SCAN_DIR}/codeql-db --format=sarif-latest --output=${SCAN_DIR}/codeql-results.sarif
-                '''
+        stage('SAST') {
+            parallel {
+                /*stage('CodeQL') {
+                    steps {
+                        script {
+                            sh '${USER_BIN}/codeql/codeql database create ${USER_DATA} --language=javascript --source-root=${SCAN_DIR} --overwrite'
+                            sh '${USER_BIN}/codeql/codeql database analyze ${USER_DATA} /home/jenkinsinstrument/codeql/javascript-queries --format=sarifv2.1.0 --output=codeql-results.sarif'
+                        }
+                    }
+                } */
+
+                stage('Semgrep') {
+                    steps {
+                        script {
+                            sh '${USER_BIN}/semgrep-1.85.0 scan -o semgrep-report-fs.json'
+                        }
+                    }
+                }
+
+                stage('Njsscan') {
+                    steps {
+                        script {
+                            sh 'njsscan ${SCAN_DIR} -o njsscan-results.json'
+}
+                    }
+                }
+            }
+        }
+stage('OSA') {
+            parallel {
+                stage('Cdxgen') {
+                    steps {
+                        script {
+                            sh '${USER_BIN}/cdxgen -o sbom.json -d ${SCAN_DIR}'
+                        }
+                    }
+                }
+
+                stage('Trivy') {
+                    steps {
+                        script {
+                            sh '${USER_BIN}/trivy fs ${SCAN_DIR} --format json --output trivy-results.json'
+                        }
+                    }
+                }
             }
         }
 
-        stage('SAST: Semgrep') {
-            steps {
-                sh '''
-                    semgrep --config=auto ${SCAN_DIR} --output ${SCAN_DIR}/semgrep-results.json --json
-                '''
+        stage('DAST') {
+            parallel {
+                stage('Nuclei') {
+                    steps {
+                        script {
+                            sh '${USER_BIN}/nuclei -target ${SCAN_DIR} -o nuclei-results.json'
+                        }
+                    }
+                }
+
+                stage('Zap') {
+                    steps {
+                        script {
+                            sh '${USER_BIN}/ZAP_2.15.0/zap.sh quick-scan --auto --target ${SCAN_DIR} --output zap-results.html'
+                        }
+                    }
+                }
             }
         }
 
-        stage('SAST: Njsscan') {
+        stage('Secrets') {
             steps {
-                sh '''
-                    njsscan ${SCAN_DIR} -o ${SCAN_DIR}/njsscan-results.json
-                '''
+                script {
+                    sh '${USER_BIN}/gitleaks --repo-path=${SCAN_DIR} --report-format=json --report-path=gitleaks-results.json'
+                }
             }
         }
 
-        stage('OSA: cdxgen') {
+        stage('IAC') {
             steps {
-                sh '''
-                    cdxgen -r -o ${SCAN_DIR}/bom-cdxgen.json ${SCAN_DIR}
-                '''
+                script {
+                    sh '${USER_BIN}/checkov -d ${SCAN_DIR} -o json > kics-results.json'
+                }
             }
         }
 
-        stage('OSA: Trivy') {
+        stage('Upload Results to DefectDojo') {
             steps {
-                sh '''
-                    trivy fs --format cyclonedx --output ${SCAN_DIR}/bom-trivy.json ${SCAN_DIR}
-                '''
+                script {
+                    def uploadToDefectDojo = """
+                        curl -X POST "${DEFECTDOJO_URL}/api/v2/import-scan/" \
+                        -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
+                        -F "file=@codeql-results.sarif" \
+                        -F "file=@semgrep-results.json" \
+                        -F "file=@njsscan-results.json" \
+                        -F "file=@sbom.json" \
+                        -F "file=@trivy-results.json" \
+                        -F "file=@nuclei-results.json" \
+                        -F "file=@zap-results.html" \
+                        -F "file=@gitleaks-results.json" \
+                        -F "file=@kics-results.json"
+                    """
+                    sh uploadToDefectDojo
+                }
             }
-        }
-stage('Upload SBOM to Dependency Track') {
-            steps {
-                sh '''
-                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${SCAN_DIR}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
-                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${SCAN_DIR}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
-                '''
-            }
-        }
-
-        stage('DAST: Nuclei') {
-            steps {
-                sh '''
-                    nuclei -t /nuclei-templates/ -o ${SCAN_DIR}/nuclei-results.txt
-                '''
-            }
-        }
-
-        stage('DAST: ZAP') {
-            steps {
-                sh '''
-                    ./zap.sh -daemon -config api.disablekey=true
-                    zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' -r ${SCAN_DIR}/zap-report.html
-                '''
-            }
-        }
-
-        stage('Secrets: Gitleaks') {
-            steps {
-                sh '''
-                    gitleaks detect --source=${SCAN_DIR} --report=${SCAN_DIR}/gitleaks-report.json
-                '''
-            }
-        }
-
-        stage('IAC: Kics') {
-            steps {
-                sh '''
-                    kics scan -p ${SCAN_DIR} -o ${SCAN_DIR}/kics-results.json
-                '''
-            }
-        }
-
-        stage('Send Results to DefectDojo') {
-            steps {
-                sh '''
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=CodeQL' -F 'file=@${SCAN_DIR}/codeql-results.sarif' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${SCAN_DIR}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${SCAN_DIR}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Nuclei' -F 'file=@${SCAN_DIR}/nuclei-results.txt' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=ZAP Scan' -F 'file=@${SCAN_DIR}/zap-report.html' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=@${SCAN_DIR}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=@${SCAN_DIR}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                '''
-            }
-        }
-    }
-    post {
-        always {
-            cleanWs()
         }
     }
 }
