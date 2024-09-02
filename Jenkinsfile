@@ -1,186 +1,161 @@
-pipeline {
+    pipeline {
     agent any
-
     environment {
-        DEFECTDOJO_URL = 'http://localhost:8081'
-        DEFECTDOJO_API_KEY = 'Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5'
-        SCAN_DIR = '/home/kali'
-        GIT_HTTP_POSTBUFFER = '524288000'
-        USER_BIN = '/home/jenkinsinstrument'
-        USER_DATA = '/home/jenkinsinstrument/databaza'
+        SCAN_DIR = "/home/kali"
+        CODEQL_VERSION = "latest"
+        DEPENDENCY_TRACK_API_KEY = credentials('dependency-track-api-key')
+        DEFECT_DOJO_API_KEY = credentials('Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5')
+        DEFECT_DOJO_URL = 'http://localhost:8081'
     }
-
     stages {
-         /* stage('Install Tools') {
+        stage('Install Dependencies') {
             steps {
-                script {
-
-                    // Устанавливаем CodeQL
-                    sh '''
-                    wget https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -O codeql.zip
-                    unzip codeql.zip -d ${USER_BIN}
-                    rm codeql.zip
-                    '''
-
-                    // Устанавливаем Semgrep
-                    sh '''
-                    wget https://github.com/semgrep/semgrep/archive/refs/tags/v1.85.0.tar.gz -O semgrep.tar.gz
-                    tar -xzf semgrep.tar.gz -C ${USER_BIN}
-                    rm semgrep.tar.gz
-                    '''
-
-                    // Устанавливаем Njsscan
-                    sh 'pip install njsscan'
-
-                    // Устанавливаем cdxgen
-                    sh '''
-                    wget https://github.com/CycloneDX/cdxgen/releases/download/v10.9.5/cdxgen-dist.zip -O cdxgen.zip
-                    unzip cdxgen.zip -d {USER_BIN}
-                    rm cdxgen.zip
-                    '''
-
-                    // Устанавливаем Trivy
-                    sh '''
-                    wget https://github.com/aquasecurity/trivy/releases/download/v0.31.2/trivy_0.31.2_Linux-64bit.tar.gz -O trivy.tar.gz
-                    tar -xzf trivy.tar.gz -C ${USER_BIN}
-                    rm trivy.tar.gz
-                    '''
-
-                    // Устанавливаем Nuclei
-                    sh '''
-                    wget https://github.com/projectdiscovery/nuclei/releases/download/v2.8.7/nuclei_2.8.7_linux_amd64.zip -O nuclei.zip
-                    unzip nuclei.zip -d ${USER_BIN}
-                    rm nuclei.zip
-                    '''
-
-                    // Устанавливаем Zap
-                    sh '''
-                    wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2.15.0_Linux.tar.gz -O zap.tar.gz
-                    tar -xzf zap.tar.gz -C ${USER_BIN}
-                    rm zap.tar.gz
-                    '''
-
-                    // Устанавливаем Gitleaks
-                    sh '''
-                    wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz -O gitleaks.tar.gz
-                    tar -xzf gitleaks.tar.gz -C ${USER_BIN}
-                    rm gitleaks.tar.gz
-                    '''
-
-                    // Устанавливаем Kics (Checkov)
-                    sh '''
-                    wget https://github.com/bridgecrewio/checkov/releases/download/3.2.239/checkov_linux_X86_64.zip -O kics.zip
-                    unzip kics.zip -d ${USER_BIN}
-                    rm kics.zip
-                    '''
-                
-                }
-            }
-        } */
-
-        stage('SAST') {
-            parallel {
-                /*stage('CodeQL') {
-                    steps {
-                        script {
-                            sh '${USER_BIN}/codeql/codeql database create ${USER_DATA} --language=javascript --source-root=${SCAN_DIR} --overwrite'
-                            sh '${USER_BIN}/codeql/codeql database analyze ${USER_DATA} /home/jenkinsinstrument/codeql/javascript-queries --format=sarifv2.1.0 --output=codeql-results.sarif'
-                        }
-                    }
-                } */
-
-                stage('Semgrep') {
-                    steps {
-                        script {
-                            sh '${USER_BIN}/semgrep-1.85.0 scan -o semgrep-report-fs.json'
-                        }
-                    }
-                }
-
-                stage('Njsscan') {
-                    steps {
-                        script {
-                            sh 'njsscan ${SCAN_DIR} -o njsscan-results.json'
-                        }
-                    }
-                }
-            }
-        }
-stage('OSA') {
-            parallel {
-                stage('Cdxgen') {
-                    steps {
-                        script {
-                            sh '${USER_BIN}/cdxgen -o sbom.json -d ${SCAN_DIR}'
-                        }
-                    }
-                }
-
-                stage('Trivy') {
-                    steps {
-                        script {
-                            sh '${USER_BIN}/trivy fs ${SCAN_DIR} --format json --output trivy-results.json'
-                        }
-                    }
-                }
+                // Устанавливаем CodeQL
+                sh '''
+                    curl -L https://github.com/github/codeql-cli-binaries/releases/download/${CODEQL_VERSION}/codeql-linux64.zip -o codeql.zip
+                    unzip codeql.zip -d /opt/codeql
+                    export PATH=$PATH:/opt/codeql/codeql
+                '''
+                // Устанавливаем Semgrep
+                sh '''
+                    curl -L https://github.com/returntocorp/semgrep/releases/latest/download/semgrep-linux-amd64 -o /usr/local/bin/semgrep
+                    chmod +x /usr/local/bin/semgrep
+                '''
+                // Устанавливаем Njsscan
+                sh '''
+                    pip install njsscan
+                '''
+                // Устанавливаем cdxgen
+                sh '''
+                    curl -L https://github.com/CycloneDX/cdxgen/releases/latest/download/cdxgen-linux-x64 -o /usr/local/bin/cdxgen
+                    chmod +x /usr/local/bin/cdxgen
+                '''
+                // Устанавливаем Trivy
+                sh '''
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+                '''
+                // Устанавливаем Nuclei
+                sh '''
+                    curl -L https://github.com/projectdiscovery/nuclei/releases/download/v2.7.4/nuclei_2.7.4_linux_amd64.zip -o nuclei.zip
+                    unzip nuclei.zip -d /usr/local/bin
+                    chmod +x /usr/local/bin/nuclei
+                '''
+                // Устанавливаем OWASP ZAP
+                sh '''
+                    curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2_11_1_unix.sh -o zap.sh
+                    chmod +x zap.sh
+                    ./zap.sh -q
+                '''
+                // Устанавливаем Gitleaks
+                sh '''
+                    curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | bash
+                '''
+                // Устанавливаем Kics
+                sh '''
+                    curl -sSfL https://github.com/Checkmarx/kics/releases/latest/download/kics-linux-amd64.tar.gz | tar -xz -C /usr/local/bin
+                '''
             }
         }
 
-        stage('DAST') {
-            parallel {
-                stage('Nuclei') {
-                    steps {
-                        script {
-                            sh '${USER_BIN}/nuclei -target ${SCAN_DIR} -o nuclei-results.json'
-                        }
-                    }
-                }
-
-                stage('Zap') {
-                    steps {
-                        script {
-                            sh '${USER_BIN}/ZAP_2.15.0/zap.sh quick-scan --auto --target ${SCAN_DIR} --output zap-results.html'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Secrets') {
+        stage('SAST: CodeQL') {
             steps {
-                script {
-                    sh '${USER_BIN}/gitleaks --repo-path=${SCAN_DIR} --report-format=json --report-path=gitleaks-results.json'
-                }
+                sh '''
+                    codeql database create ${SCAN_DIR}/codeql-db --language=javascript --source-root=${SCAN_DIR}
+                    codeql database analyze ${SCAN_DIR}/codeql-db --format=sarif-latest --output=${SCAN_DIR}/codeql-results.sarif
+                '''
             }
         }
 
-        stage('IAC') {
+        stage('SAST: Semgrep') {
             steps {
-                script {
-                    sh '${USER_BIN}/checkov -d ${SCAN_DIR} -o json > kics-results.json'
-                }
+                sh '''
+                    semgrep --config=auto ${SCAN_DIR} --output ${SCAN_DIR}/semgrep-results.json --json
+                '''
             }
         }
 
-        stage('Upload Results to DefectDojo') {
+        stage('SAST: Njsscan') {
             steps {
-                script {
-                    def uploadToDefectDojo = """
-                        curl -X POST "${DEFECTDOJO_URL}/api/v2/import-scan/" \
-                        -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
-                        -F "file=@codeql-results.sarif" \
-                        -F "file=@semgrep-results.json" \
-                        -F "file=@njsscan-results.json" \
-                        -F "file=@sbom.json" \
-                        -F "file=@trivy-results.json" \
-                        -F "file=@nuclei-results.json" \
-                        -F "file=@zap-results.html" \
-                        -F "file=@gitleaks-results.json" \
-                        -F "file=@kics-results.json"
-                    """
-                    sh uploadToDefectDojo
-                }
+                sh '''
+                    njsscan ${SCAN_DIR} -o ${SCAN_DIR}/njsscan-results.json
+                '''
             }
+        }
+
+        stage('OSA: cdxgen') {
+            steps {
+                sh '''
+                    cdxgen -r -o ${SCAN_DIR}/bom-cdxgen.json ${SCAN_DIR}
+                '''
+            }
+        }
+
+        stage('OSA: Trivy') {
+            steps {
+                sh '''
+                    trivy fs --format cyclonedx --output ${SCAN_DIR}/bom-trivy.json ${SCAN_DIR}
+                '''
+            }
+        }
+stage('Upload SBOM to Dependency Track') {
+            steps {
+                sh '''
+                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${SCAN_DIR}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${SCAN_DIR}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                '''
+            }
+        }
+
+        stage('DAST: Nuclei') {
+            steps {
+                sh '''
+                    nuclei -t /nuclei-templates/ -o ${SCAN_DIR}/nuclei-results.txt
+                '''
+            }
+        }
+
+        stage('DAST: ZAP') {
+            steps {
+                sh '''
+                    ./zap.sh -daemon -config api.disablekey=true
+                    zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' -r ${SCAN_DIR}/zap-report.html
+                '''
+            }
+        }
+
+        stage('Secrets: Gitleaks') {
+            steps {
+                sh '''
+                    gitleaks detect --source=${SCAN_DIR} --report=${SCAN_DIR}/gitleaks-report.json
+                '''
+            }
+        }
+
+        stage('IAC: Kics') {
+            steps {
+                sh '''
+                    kics scan -p ${SCAN_DIR} -o ${SCAN_DIR}/kics-results.json
+                '''
+            }
+        }
+
+        stage('Send Results to DefectDojo') {
+            steps {
+                sh '''
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=CodeQL' -F 'file=@${SCAN_DIR}/codeql-results.sarif' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${SCAN_DIR}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${SCAN_DIR}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Nuclei' -F 'file=@${SCAN_DIR}/nuclei-results.txt' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=ZAP Scan' -F 'file=@${SCAN_DIR}/zap-report.html' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=@${SCAN_DIR}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=@${SCAN_DIR}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
