@@ -92,7 +92,7 @@ pipeline {
                 stage('Semgrep') {
                     steps {
                         script {
-                            sh '${USER_BIN}/semgrep-1.85.0 --config="auto" ${SCAN_DIR} --output=semgrep-results.json'
+                            sh '${USER_BIN}/semgrep-1.85.0 scan -o semgrep-report-fs.json'
                         }
                     }
                 }
