@@ -18,6 +18,12 @@ pipeline {
                 sh '''
                 mkdir -p ${TOOLS_DIR}
                 '''
+                // Устанавливаем CodeQL
+                sh '''
+                    curl -L https://github.com/github/codeql-cli-binaries/releases/download/latest/codeql-linux64.zip -o codeql.zip
+                    unzip codeql.zip -d ${CODEQL_DIR}
+                    export PATH=$PATH:${CODEQL_DIR}/codeql
+                   '''
                 // Устанавливаем Semgrep
                 sh '''
                     pip3 install semgrep
