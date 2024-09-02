@@ -14,6 +14,10 @@ pipeline {
     stages {
          stage('Install Dependencies') {
             steps {
+                // Создаем директорию
+                sh '''
+                mkdir -p ${TOOLS_DIR}
+                '''
                 // Устанавливаем Semgrep
                 sh '''
                     curl -L https://github.com/returntocorp/semgrep/releases/latest/download/semgrep-linux-amd64 -o ${TOOLS_DIR}/semgrep
