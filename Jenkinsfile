@@ -32,7 +32,7 @@ pipeline {
                 '''
                 // Устанавливаем CodeQL
                 sh '''
-                    curl -L https://github.com/github/codeql-cli-binaries/releases/download/latest/codeql-linux64.zip -o codeql.zip
+                    curl -L https://github.com/github/codeql-cli-binaries/releases/download/v2.18.3/codeql-linux64.zip -o codeql.zip
                     unzip codeql.zip -d ${CODEQL_DIR}
                     export PATH=$PATH:${CODEQL_DIR}/codeql
                 '''
