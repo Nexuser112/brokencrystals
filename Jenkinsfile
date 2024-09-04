@@ -108,7 +108,7 @@ pipeline {
         stage('SAST: Njsscan') {
             steps {
                 sh '''
-                    njsscan ${SCAN_DIR} --output ${RESULTS}
+                    njsscan ${JENKWORK} --output ${RESULTS}
                 '''
             }
         }
@@ -157,7 +157,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('Secrets: Gitleaks') {
             steps {
                 sh '''
-                    gitleaks detect --source=${SCAN_DIR} --report=${RESULTS}/gitleaks-report.json
+                    gitleaks detect --source=${JENKWORK} --report=${RESULTS}/gitleaks-report.json
                 '''
             }
         }
@@ -165,7 +165,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('IAC: Kics') {
             steps {
                 sh '''
-                    checkov -d /home/kali --output-file-path ${RESULTS}/kics-results.json
+                    checkov -d ${JENKWORK} --output-file-path ${RESULTS}/kics-results.json
                 '''
             }
         }
