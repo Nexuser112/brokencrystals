@@ -9,6 +9,8 @@ pipeline {
         SCAN_DIR = '/home/kali'
         GIT_HTTP_POSTBUFFER = '524288000'
         USER_DATA = '/home/jenkinsinstrument/databaza'
+        RESULTS = '/var/lib/jenkins/workspace/BrokenCrystals/results'
+        DATABASE = '/var/lib/jenkins/workspace/BrokenCrystals/database'
     }
 
     stages {
@@ -86,8 +88,8 @@ pipeline {
         stage('SAST: CodeQL') {
             steps {
                 sh '''
-                    ${CODEQL_DIR}/codeql/codeql database create ${SCAN_DIR}/codeql-db --language=javascript --source-root=${SCAN_DIR}
-                    ${CODEQL_DIR}/codeql/codeql database analyze ${SCAN_DIR}/codeql-db --format=sarif-latest --output=${SCAN_DIR}/codeql-results.sarif
+                    ${CODEQL_DIR}/codeql/codeql database create ${DATABASE}/codeql-db --language=javascript --source-root=${DATABASE}
+                    ${CODEQL_DIR}/codeql/codeql database analyze ${DATABASE}/codeql-db --format=sarif-latest --output=${RESULTS}/codeql-results.sarif
                 '''
             }
         }
@@ -95,7 +97,7 @@ pipeline {
         stage('SAST: Semgrep') {
             steps {
                 sh '''
-                    ${TOOLS_DIR}/semgrep --config=auto ${SCAN_DIR} --output ${SCAN_DIR}/semgrep-results.json --json
+                    ${TOOLS_DIR}/semgrep --config=auto ${SCAN_DIR} --output ${RESULTS}/semgrep-results.json --json
                 '''
 
             }
@@ -104,7 +106,7 @@ pipeline {
         stage('SAST: Njsscan') {
             steps {
                 sh '''
-                    njsscan ${SCAN_DIR} -o ${SCAN_DIR}/njsscan-results.json
+                    njsscan ${SCAN_DIR} -o ${RESULTS}/njsscan-results.json
                 '''
             }
         }
@@ -112,7 +114,7 @@ pipeline {
         stage('OSA: cdxgen') {
             steps {
                 sh '''
-                    cdxgen -r -o ${SCAN_DIR}/bom-cdxgen.json ${SCAN_DIR}
+                    cdxgen -r -o ${SCAN_DIR}/bom-cdxgen.json ${RESULTS}
                 '''
             }
         }
@@ -120,15 +122,15 @@ pipeline {
         stage('OSA: Trivy') {
             steps {
                 sh '''
-                    trivy fs --format cyclonedx --output ${SCAN_DIR}/bom-trivy.json ${SCAN_DIR}
+                    trivy fs --format cyclonedx --output ${RESULTS}/bom-trivy.json ${SCAN_DIR}
                 '''
             }
         }
 stage('Upload SBOM to Dependency Track') {
             steps {
                 sh '''
-                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${SCAN_DIR}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
-                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${SCAN_DIR}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
                 '''
             }
         }
@@ -136,7 +138,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('DAST: Nuclei') {
             steps {
                 sh '''
-                    nuclei -t /nuclei-templates/ -o ${SCAN_DIR}/nuclei-results.txt
+                    nuclei -t /nuclei-templates/ -o ${RESULTS}/nuclei-results.txt
                 '''
             }
         }
@@ -145,7 +147,7 @@ stage('Upload SBOM to Dependency Track') {
             steps {
                 sh '''
                     ./zap.sh -daemon -config api.disablekey=true
-                    zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' -r ${SCAN_DIR}/zap-report.html
+                    zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' -r ${RESULTS}/zap-report.html
                 '''
             }
         }
@@ -153,7 +155,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('Secrets: Gitleaks') {
             steps {
                 sh '''
-                    gitleaks detect --source=${SCAN_DIR} --report=${SCAN_DIR}/gitleaks-report.json
+                    gitleaks detect --source=${SCAN_DIR} --report=${RESULTS}/gitleaks-report.json
                 '''
             }
         }
@@ -161,7 +163,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('IAC: Kics') {
             steps {
                 sh '''
-                    kics scan -p ${SCAN_DIR} -o ${SCAN_DIR}/kics-results.json
+                    kics scan -p ${SCAN_DIR} -o ${RESULTS}/kics-results.json
                 '''
             }
         }
@@ -169,13 +171,13 @@ stage('Upload SBOM to Dependency Track') {
         stage('Send Results to DefectDojo') {
             steps {
                 sh '''
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=CodeQL' -F 'file=@${SCAN_DIR}/codeql-results.sarif' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${SCAN_DIR}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${SCAN_DIR}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Nuclei' -F 'file=@${SCAN_DIR}/nuclei-results.txt' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=ZAP Scan' -F 'file=@${SCAN_DIR}/zap-report.html' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=@${SCAN_DIR}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=@${SCAN_DIR}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=CodeQL' -F 'file=@${RESULTS}/codeql-results.sarif' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${RESULTS}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${RESULTS}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Nuclei' -F 'file=@${RESULTS}/nuclei-results.txt' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=ZAP Scan' -F 'file=@${RESULTS}/zap-report.html' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=@${RESULTS}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=@${RESULTS}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                 '''
             }
         }
