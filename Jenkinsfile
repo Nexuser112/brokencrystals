@@ -11,6 +11,7 @@ pipeline {
         USER_DATA = '/home/jenkinsinstrument/databaza'
         RESULTS = '/var/lib/jenkins/workspace/BrokenCrystals/results'
         DATABASE = '/var/lib/jenkins/workspace/BrokenCrystals/database'
+        JENKWORK = '/var/lib/jenkins/workspace/BrokenCrystals'
     }
 
     stages {
@@ -94,19 +95,19 @@ pipeline {
             }
         } */
 
-        /*stage('SAST: Semgrep') {
+        stage('SAST: Semgrep') {
             steps {
                 sh '''
-                    semgrep scan -o semgrep-results.json 
+                    semgrep scan --config=auto
                 '''
 
             }
-        }*/
+        }
 
         stage('SAST: Njsscan') {
             steps {
                 sh '''
-                    njsscan ${SCAN_DIR} -o ${RESULTS}/njsscan-results.json
+                    njsscan ${SCAN_DIR} --output ${RESULTS}
                 '''
             }
         }
@@ -114,7 +115,7 @@ pipeline {
         stage('OSA: cdxgen') {
             steps {
                 sh '''
-                    cdxgen -r -o ${SCAN_DIR}/bom-cdxgen.json ${RESULTS}
+                    cdxgen -r -o ${RESULTS}/bom-cdxgen.json 
                 '''
             }
         }
@@ -122,7 +123,7 @@ pipeline {
         stage('OSA: Trivy') {
             steps {
                 sh '''
-                    trivy fs --format cyclonedx --output ${RESULTS}/bom-trivy.json ${SCAN_DIR}
+                    trivy fs --output ${RESULTS}/bom-trivy.json 
                 '''
             }
         }
@@ -138,7 +139,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('DAST: Nuclei') {
             steps {
                 sh '''
-                    nuclei -t /nuclei-templates/ -o ${RESULTS}/nuclei-results.txt
+                    nuclei -u https://github.com/Nexuser112/brokencrystals --output ${RESULTS}
                 '''
             }
         }
@@ -146,7 +147,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('DAST: ZAP') {
             steps {
                 sh '''
-                    ./zap.sh -daemon -config api.disablekey=true
+                    ${JENKWORK}./zap.sh -daemon -config api.disablekey=true
                     zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' -r ${RESULTS}/zap-report.html
                 '''
             }
@@ -163,7 +164,7 @@ stage('Upload SBOM to Dependency Track') {
         stage('IAC: Kics') {
             steps {
                 sh '''
-                    kics scan -p ${SCAN_DIR} -o ${RESULTS}/kics-results.json
+                    checkov -d /home/kali --output-file-path ${RESULTS}/kics-results.json
                 '''
             }
         }
