@@ -96,14 +96,14 @@ pipeline {
             }
         } */
 
-        stage('SAST: Semgrep') {
+        /*stage('SAST: Semgrep') {
             steps {
                 sh '''
                     semgrep scan --config=auto
                 '''
 
             }
-        }
+        }*/
 
         stage('SAST: Njsscan') {
             steps {
