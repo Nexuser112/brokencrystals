@@ -97,7 +97,7 @@ pipeline {
         stage('SAST: Semgrep') {
             steps {
                 sh '''
-                    semgrep scan -o ${RESULTS}/semgrep-results.json 
+                    semgrep scan -o semgrep-results.json 
                 '''
 
             }
