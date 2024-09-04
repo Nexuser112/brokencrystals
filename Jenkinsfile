@@ -88,7 +88,7 @@ pipeline {
         stage('SAST: CodeQL') {
             steps {
                 sh '''
-                    ${CODEQL_DIR}/codeql/codeql database create ${DATABASE}/codeql-db --language=javascript --source-root=${SCAN_DIR}
+                    ${CODEQL_DIR}/codeql/codeql database create ${DATABASE}/codeql-db --language=javascript --source-root=${SCAN_DIR} --overwrite
                     ${CODEQL_DIR}/codeql/codeql database analyze ${DATABASE}/codeql-db --format=sarif-latest --output=${RESULTS}/codeql-results.sarif
                 '''
             }
