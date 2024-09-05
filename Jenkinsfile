@@ -160,7 +160,7 @@ pipeline {
         stage('DAST: Nuclei') {
             steps {
                 sh '''
-                    nuclei -u https://github.com/Nexuser112/brokencrystals --output ${RESULTS}
+                    nuclei -u https://github.com/Nexuser112/brokencrystals --output ${RESULTS}/nuclei-results.txt
                 '''
             }
         }
