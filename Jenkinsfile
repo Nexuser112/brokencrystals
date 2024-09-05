@@ -7,6 +7,7 @@ pipeline {
         DEFECTDOJO_URL = 'http://localhost:8081'
         DEFECTDOJO_API_KEY = 'Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5'
         DEPENDENCY_TRACK_API_KEY = 'odt_vxkDaeowHl9KC1CmcL11C1GNCS0QjS2U'
+        DEPENDENCY_TRACK_URL = 'http://localhost:8080'
         SCAN_DIR = '/home/kali'
         GIT_HTTP_POSTBUFFER = '524288000'
         USER_DATA = '/home/jenkinsinstrument/databaza'
@@ -128,11 +129,14 @@ pipeline {
                 '''
             }
         }
-stage('Upload SBOM to Dependency Track') {
+        stage('Upload SBOM to Dependency Track') {
             steps {
                 sh '''
-                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
-                    curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                     curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                '''
+                // Загрузка SBOM trivy
+                sh '''
+                     curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
                 '''
             }
         }
