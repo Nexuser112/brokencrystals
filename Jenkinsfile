@@ -124,7 +124,7 @@ pipeline {
         stage('OSA: Trivy') {
             steps {
                 sh '''
-                    trivy fs --cache-dir --output ${RESULTS}/bom-trivy.json 
+                    trivy fs --format json --output ${RESULTS}/bom-trivy.json ${JENKWORK}/tools
                 '''
             }
         }
