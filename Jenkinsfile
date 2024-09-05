@@ -108,7 +108,7 @@ pipeline {
         stage('SAST: Njsscan') {
             steps {
                 sh '''
-                    njsscan ${JENKWORK} --output ${RESULTS}
+                    njsscan ${JENKWORK}/zap.sh --output ${RESULTS}
                 '''
             }
         }
