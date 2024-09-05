@@ -124,7 +124,7 @@ pipeline {
         stage('OSA: Trivy') {
             steps {
                 sh '''
-                    trivy fs --output ${RESULTS}/bom-trivy.json 
+                    trivy fs --cache-dir --output ${RESULTS}/bom-trivy.json 
                 '''
             }
         }
