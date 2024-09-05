@@ -132,11 +132,27 @@ pipeline {
         stage('Upload SBOM to Dependency Track') {
             steps {
                 sh '''
-                     curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-cdxgen.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                     curl -X "POST" "http://localhost:8080/api/v1/bom" \
+                        -H 'Content-Type: application/json' \
+                        -H "X-API-Key: ${DEPENDENCY_TRACK_API_KEY}" \
+                        -d @- << 'EOF'
+                       {
+                        "project": "f90934f5-cb88-47ce-81cb-db06fc67d4b4",
+                        "bom": $(cat ${RESULTS}/bom-cdxgen.json)
+                       }
+                        EOF
                 '''
                 // Загрузка SBOM trivy
                 sh '''
-                     curl -X POST -H "X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}" -H "Content-Type: application/json" --data @${RESULTS}/bom-trivy.json ${DEPENDENCY_TRACK_URL}/api/v1/bom
+                     curl -X "POST" "http://localhost:8080/api/v1/bom" \
+                        -H 'Content-Type: application/json' \
+                        -H "X-API-Key: ${DEPENDENCY_TRACK_API_KEY}" \
+                        -d @- << 'EOF'
+                       {
+                        "project": "f90934f5-cb88-47ce-81cb-db06fc67d4b4",
+                        "bom": $(cat ${RESULTS}/bom-trivy.json)
+                       }
+                        EOF
                 '''
             }
         }
