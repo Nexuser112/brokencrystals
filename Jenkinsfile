@@ -195,13 +195,20 @@ pipeline {
                 
                     /*curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=CodeQL' -F 'file=@${RESULTS}/codeql-results.sarif' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${RESULTS}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${RESULTS}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/*/
-                    sh '''
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${RESULTS}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Nuclei' -F 'file=${RESULTS}/nuclei-results.txt' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=ZAP Scan' -F 'file=${RESULTS}/zap-report.html' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=${RESULTS}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=${RESULTS}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    '''
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=${RESULTS}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/*/
+                  sh """
+                    curl -X POST "http://<DefectDojo_URL>/api/v2/import-scan/" \
+                        -H "Authorization: ApiKey nexuser112:${DEFECT_DOJO_API_KEY}" \
+                        -F 'file=${RESULTS}/nuclei-results.txt' \
+                        -F 'scan_type=Nuclei' \
+                        -F 'engagement=1' \
+                        -F 'active=true' \
+                        -F 'verified=true'
+                    """
             }
         }
     }
