@@ -187,11 +187,7 @@ pipeline {
                 
                     /*curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=CodeQL' -F 'file=@${RESULTS}/codeql-results.sarif' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${RESULTS}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${RESULTS}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Nuclei' -F 'file=${RESULTS}/nuclei-results.txt' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=ZAP Scan' -F 'file=${RESULTS}/zap-report.html' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=${RESULTS}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
-                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=${RESULTS}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/*/
+                    curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${RESULTS}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/*/
                   sh '''
                   curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
                   -H "accept: application/json" \
@@ -199,6 +195,42 @@ pipeline {
                   -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
                   -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.json" \
                   -F "scan_type=Nuclei SCAN" \
+                  -F "engagement=1" \
+                  -F "active=true" \
+                  -F "verified=false" 
+                '''
+
+                 sh '''
+                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  -H "accept: application/json" \
+                  -H "Content-Type: multipart/form-data" \
+                  -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
+                  -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/zap-report.html" \
+                  -F "scan_type=ZAP SCAN" \
+                  -F "engagement=1" \
+                  -F "active=true" \
+                  -F "verified=false" 
+                '''
+
+                 sh '''
+                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  -H "accept: application/json" \
+                  -H "Content-Type: multipart/form-data" \
+                  -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
+                  -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/gitleaks-report.json" \
+                  -F "scan_type=Gitleaks SCAN" \
+                  -F "engagement=1" \
+                  -F "active=true" \
+                  -F "verified=false" 
+                '''
+
+                 sh '''
+                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  -H "accept: application/json" \
+                  -H "Content-Type: multipart/form-data" \
+                  -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
+                  -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/kics-results.json" \
+                  -F "scan_type=KICS SCAN" \
                   -F "engagement=1" \
                   -F "active=true" \
                   -F "verified=false" 
