@@ -201,8 +201,7 @@ pipeline {
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Gitleaks' -F 'file=${RESULTS}/gitleaks-report.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=KICS' -F 'file=${RESULTS}/kics-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/*/
                   sh """
-                    curl -u nexuser112:Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5
-                    -X POST "http://localhost:8081/api/v2/import-scan/" \
+                    curl -X POST "http://localhost:8081/api/v2/import-scan/" \
                     -H 'Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5' \
                     -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.json" \
                     -F 'scan_type=Nuclei' \
