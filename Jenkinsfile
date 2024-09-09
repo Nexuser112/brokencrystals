@@ -208,7 +208,7 @@ pipeline {
                     -F "active=true" \
                     -F "verified=true" \
                     -F "scan_type=Nuclei Scan" \
-                    -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.json"
+                    -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.txt"
                     '''
             }
         }
