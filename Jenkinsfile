@@ -88,7 +88,7 @@ pipeline {
             }
         } */
 
-        /*stage('SAST: CodeQL') {
+        stage('SAST: CodeQL') {
             steps {
                 sh '''
                     ${CODEQL_DIR}/codeql/codeql database create ${DATABASE}/codeql-db --language=javascript --source-root=${SCAN_DIR} --overwrite
@@ -180,7 +180,7 @@ pipeline {
                     checkov -d ${JENKWORK} --output-file-path ${RESULTS}/kics-results.json
                 '''
             }
-        }*/
+        }
 
         stage('Send Results to DefectDojo') {
             steps {
