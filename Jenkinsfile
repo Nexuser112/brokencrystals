@@ -203,7 +203,7 @@ pipeline {
                   sh """
                     curl -X POST "http://localhost:8081/api/v2/import-scan/" \
                     -H 'Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5' \
-                    -F 'file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.txt' \
+                    -F 'file=/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.json' \
                     -F 'scan_type=Nuclei JSON' \
                     -F 'engagement=1' \
                     -F 'active=true' \
