@@ -132,19 +132,19 @@ pipeline {
         stage('Upload SBOM to Dependency Track') {
             steps {
                 sh '''
-                    curl -X "POST" "http://dtrack.example.com/api/v1/bom" \
+                    curl -X "POST" "http://localhost:8080/api/v1/bom" \
                     -H 'Content-Type: multipart/form-data' \
-                    -H 'X-Api-Key: LPojpCDSsEd4V9Zi6qCWr4KsiF3Konze' \
-                    -F "project=f90934f5-cb88-47ce-81cb-db06fc67d4b4" \
-                    -F "bom=@path/to/bom.xml"
+                    -H 'X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}' \
+                    -F "project=fa0b4dc0-c383-4397-9ebe-f9a9b80665b5" \
+                    -F "bom=@${RESULTS}to/bom-cdxgen.json"
                 '''
                 // Загрузка SBOM trivy
                 sh '''
                       curl -X "POST" "http://localhost:8080/api/v1/bom" \
                     -H 'Content-Type: multipart/form-data' \
                     -H 'X-Api-Key: ${DEPENDENCY_TRACK_API_KEY}' \
-                    -F "project=f90934f5-cb88-47ce-81cb-db06fc67d4b4" \
-                    -F "bom=@path/to/bom.xml"
+                    -F "project=fa0b4dc0-c383-4397-9ebe-f9a9b80665b5" \
+                    -F "bom=@${RESULTS}/trivy-report-fsjson"
                 '''
             }
         }
