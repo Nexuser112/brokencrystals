@@ -88,7 +88,7 @@ pipeline {
             }
         } */
 
-        /*stage('SAST: CodeQL') {
+        stage('SAST: CodeQL') {
             steps {
                 sh '''
                     ${CODEQL_DIR}/codeql/codeql database create ${DATABASE}/codeql-db --language=javascript --source-root=${SCAN_DIR} --overwrite
@@ -97,7 +97,7 @@ pipeline {
             }
         } */
 
-        /*stage('SAST: Semgrep') {
+        stage('SAST: Semgrep') {
             steps {
                 sh '''
                     semgrep scan --config=auto
