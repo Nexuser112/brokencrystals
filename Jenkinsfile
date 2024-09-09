@@ -203,12 +203,12 @@ pipeline {
                   sh '''
                     curl -k -X POST "http://localhost:8080/api/v2/import-scan/" \
                     -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5" \
-                    -F "engagement=1" \  
-                    -F "minimum_severity=Low" \  
-                    -F "active=true" \  
-                    -F "verified=true" \  
-                    -F "scan_type=Nuclei Scan" \  # Тип сканирования
-                    -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.json"  # Файл с результатами сканирования
+                    -F "engagement=1" \
+                    -F "minimum_severity=Low" \
+                    -F "active=true" \
+                    -F "verified=true" \
+                    -F "scan_type=Nuclei Scan" \
+                    -F "file=@/var/lib/jenkins/workspace/BrokenCrystals/results/nuclei-results.json"
                     '''
             }
         }
