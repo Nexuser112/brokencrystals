@@ -189,7 +189,7 @@ pipeline {
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Semgrep' -F 'file=@${RESULTS}/semgrep-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/
                     curl -X POST -H "Authorization: ApiKey ${DEFECT_DOJO_API_KEY}" -F 'scan_type=Njsscan' -F 'file=@${RESULTS}/njsscan-results.json' ${DEFECT_DOJO_URL}/api/v2/import-scan/*/
                   sh '''
-                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  curl -s -X --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
                   -H "accept: application/json" \
                   -H "Content-Type: multipart/form-data" \
                   -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
@@ -201,7 +201,7 @@ pipeline {
                 '''
 
                  sh '''
-                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  curl -s -X --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
                   -H "accept: application/json" \
                   -H "Content-Type: multipart/form-data" \
                   -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
@@ -213,7 +213,7 @@ pipeline {
                 '''
 
                  sh '''
-                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  curl -s -X --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
                   -H "accept: application/json" \
                   -H "Content-Type: multipart/form-data" \
                   -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
@@ -225,7 +225,7 @@ pipeline {
                 '''
 
                  sh '''
-                  curl -s -X - --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
+                  curl -s -X --insecure -X POST "http://localhost:8081/api/v2/import-scan/" \
                   -H "accept: application/json" \
                   -H "Content-Type: multipart/form-data" \
                   -H "Authorization: Token 8c242caae0c31ccdb9d3667e0befe055dad34bc5"  \
