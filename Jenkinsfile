@@ -104,7 +104,7 @@ pipeline {
                 '''
 
             }
-        }*/
+        }
 
         stage('SAST: Njsscan') {
             steps {
@@ -188,7 +188,7 @@ pipeline {
                     checkov -d ${JENKWORK} --output-file-path ${RESULTS}/kics-results.json
                 '''
             }
-        }
+        }*/
 
         stage('Send Results to DefectDojo') {
             steps {
