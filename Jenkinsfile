@@ -210,7 +210,6 @@ pipeline {
               -F "engagement=1" \
               -F "active=true" \
               -F "verified=false" \
-              -F "close_old_findings=false"
                     '''
             }
         }
